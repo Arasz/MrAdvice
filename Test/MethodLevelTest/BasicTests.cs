@@ -229,5 +229,20 @@ namespace MethodLevelTest
         //{
         //    new EmptyAdvisedClass().MethodWithGenericParameterTest(6);
         //}
+
+        class A {}
+        class B {}
+
+        public void M<T>(T instance)
+        {
+            var t = typeof (T);
+        }
+
+        [TestMethod]
+        public void T()
+        {
+            M<A>(null);
+            M<B>(null);
+        }
     }
 }
