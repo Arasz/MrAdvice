@@ -39,6 +39,11 @@ namespace ArxOne.MrAdvice
         // ReSharper disable once UnusedMethodReturnValue.Global
         public static object ProceedAdvice(object target, object[] parameters, MethodBase methodBase, MethodInfo innerMethod)
         {
+            if (methodBase.IsGenericMethodDefinition)
+            {
+                var t = methodBase.GetGenericArguments();
+            }
+
             AspectInfo aspectInfo;
             lock (AspectInfos)
             {

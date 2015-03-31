@@ -35,6 +35,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MrAdvice", "MrAdvice\MrAdvi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MrAdvice.Weaver", "MrAdvice.Weaver\MrAdvice.Weaver.csproj", "{2CCCBE1D-9CC5-40A9-A816-484F98B10774}"
 	ProjectSection(ProjectDependencies) = postProject
+		{D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9} = {D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9}
 		{3C764938-4C4A-4128-B20F-97EF2ED4A49B} = {3C764938-4C4A-4128-B20F-97EF2ED4A49B}
 	EndProjectSection
 EndProject
@@ -50,6 +51,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExternalAdviceTest", "Test\
 	ProjectSection(ProjectDependencies) = postProject
 		{2CCCBE1D-9CC5-40A9-A816-484F98B10774} = {2CCCBE1D-9CC5-40A9-A816-484F98B10774}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MrAdvice (Silverlight)", "MrAdvice (Silverlight)\MrAdvice (Silverlight).csproj", "{D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -85,6 +88,10 @@ Global
 		{B9F3D5B6-8FF9-491B-8CE3-BD014885BBA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9F3D5B6-8FF9-491B-8CE3-BD014885BBA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9F3D5B6-8FF9-491B-8CE3-BD014885BBA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D7BBBE02-8B7E-4C13-BA46-1E701FBA9DD9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

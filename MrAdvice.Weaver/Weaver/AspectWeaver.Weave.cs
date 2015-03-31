@@ -79,7 +79,7 @@ namespace ArxOne.MrAdvice.Weaver
         /// Weaves the specified method.
         /// </summary>
         /// <param name="method">The method.</param>
-        private void WeaveAdvices(MethodDefinition method)
+        private void WeaveMethodAdvices(MethodDefinition method)
         {
             Logger.WriteDebug("Weaving method '{0}'", method.FullName);
 
@@ -113,8 +113,8 @@ namespace ArxOne.MrAdvice.Weaver
         /// <summary>
         /// Writes the pointcut body.
         /// </summary>
-        /// <param name="method">The method.</param>
-        /// <param name="innerMethod">The inner method.</param>
+        /// <param name="method">The original method, with an empty body.</param>
+        /// <param name="innerMethod">The inner method (a new method) containing the original method body.</param>
         /// <exception cref="System.InvalidOperationException">
         /// </exception>
         private void WritePointcutBody(MethodDefinition method, MethodDefinition innerMethod)
@@ -170,8 +170,9 @@ namespace ArxOne.MrAdvice.Weaver
             instructions.Emit(OpCodes.Call, moduleDefinition.SafeImport(ReflectionUtility.GetMethodInfo(() => MethodBase.GetCurrentMethod())));
 
             // ... inner... If provided
-            if (innerMethod != null)
+            if (innerMethod != null && !innerMethod.HasGenericParameters)
             {
+                // We build an Action with methodptr to InnerMethod and invoke its get_Method member
                 var actionType = moduleDefinition.SafeImport(typeof(Action));
                 var actionCtor = moduleDefinition.SafeImport(actionType.Resolve().GetConstructors().Single());
 
@@ -231,7 +232,8 @@ namespace ArxOne.MrAdvice.Weaver
 
         /// <summary>
         /// Weaves the introductions.
-        /// Introduces members as requested by aspects
+        /// Introduces members as requested by aspects.
+        /// Whereas a method is provided as parameter, the whole type is targeted here.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="adviceInterface">The advice interface.</param>
@@ -245,7 +247,7 @@ namespace ArxOne.MrAdvice.Weaver
             foreach (var advice in advices)
             {
                 var adviceDefinition = advice.Resolve();
-                foreach (var field in adviceDefinition.Fields.Where(f=>f.IsPublic))
+                foreach (var field in adviceDefinition.Fields.Where(f => f.IsPublic))
                     IntroduceMember(method.Module, field.Name, field.FieldType, field.IsStatic, advice, typeDefinition, markerAttributeCtor);
                 foreach (var property in adviceDefinition.Properties.Where(p => p.HasAnyPublic()))
                     IntroduceMember(method.Module, property.Name, property.PropertyType, !property.HasThis, advice, typeDefinition, markerAttributeCtor);
@@ -275,12 +277,12 @@ namespace ArxOne.MrAdvice.Weaver
         /// <param name="adviceInterface">The advice interface.</param>
         private void WeaveMethod(ModuleDefinition moduleDefinition, MethodDefinition method, TypeDefinition adviceInterface)
         {
-            if (method.HasGenericParameters)
-            {
-                Logger.WriteWarning("Method {0} has generic parameters, it can not be weaved", method.FullName);
-                return;
-            }
-            WeaveAdvices(method);
+            //if (method.HasGenericParameters)
+            //{
+            //    Logger.WriteWarning("Method {0} has generic parameters, it can not be weaved", method.FullName);
+            //    return;
+            //}
+            WeaveMethodAdvices(method);
             WeaveIntroductions(method, adviceInterface, moduleDefinition);
         }
 

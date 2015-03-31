@@ -23,8 +23,10 @@ Write your own aspects in the form of attributes and apply them to target method
   </metadata>
   <files>
     <file src="NuGet\**\*" target="."/>
-    <file src="..\MrAdvice\bin\$ConfigurationName$\MrAdvice.dll" target="lib\portable-net40+sl5+wp8"/>
-    <file src="..\MrAdvice\bin\$ConfigurationName$\MrAdvice.xml" target="lib\portable-net40+sl5+wp8"/>
+    <file src="..\MrAdvice\bin\$ConfigurationName$\MrAdvice.dll" target="lib\net40-Client"/>
+    <file src="..\MrAdvice\bin\$ConfigurationName$\MrAdvice.xml" target="lib\net40-Client"/>
+    <file src="..\MrAdvice (Silverlight)\bin\$ConfigurationName$\MrAdvice.dll" target="lib\sl5"/>
+    <file src="..\MrAdvice (Silverlight)\bin\$ConfigurationName$\MrAdvice.xml" target="lib\sl5"/>
     <file src="bin\$ConfigurationName$\MrAdvice.Weaver.Fody.dll" target="."/>
   </files>
 </package>
