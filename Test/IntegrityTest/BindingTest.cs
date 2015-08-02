@@ -9,6 +9,7 @@ namespace IntegrityTest
     using System.Reflection;
     using ArxOne.MrAdvice;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
     using ArxOne.MrAdvice.Annotation;
     using ArxOne.MrAdvice.Introduction;
     using ArxOne.MrAdvice.Utility;
@@ -31,6 +32,19 @@ namespace IntegrityTest
         {
             var infoAdviceType = typeof(IInfoAdvice);
             Assert.AreEqual(infoAdviceType.FullName, Binding.InfoAdviceInterfaceName);
+        }
+        [TestMethod]
+        [TestCategory("Integrity")]
+        public void AdviceContextInterfaceNameTest()
+        {
+            var infoAdviceType = typeof(IAdviceContext);
+            Assert.AreEqual(infoAdviceType.FullName, Binding.AdviceContextInterfaceName);
+        }[TestMethod]
+        [TestCategory("Integrity")]
+        public void InfoAdviceContextInterfaceNameTest()
+        {
+            var infoAdviceType = typeof(IInfoAdviceContext);
+            Assert.AreEqual(infoAdviceType.FullName, Binding.InfoAdviceContextInterfaceName);
         }
         [TestMethod]
         [TestCategory("Integrity")]

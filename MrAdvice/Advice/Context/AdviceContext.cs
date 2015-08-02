@@ -11,7 +11,7 @@ namespace ArxOne.MrAdvice.Advice.Context
     /// <summary>
     /// Advice context base class
     /// </summary>
-    public abstract class AdviceContext : IAdviceContextTarget
+    public abstract class AdviceContext : IAdviceContext, IAdviceContextTarget
     {
         private readonly AdviceContext _nextAdviceContext;
 

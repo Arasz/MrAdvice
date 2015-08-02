@@ -11,7 +11,7 @@ namespace ArxOne.MrAdvice.Advice.Context
     /// <summary>
     /// Base class for advice information context
     /// </summary>
-    public class AdviceInfoContext : IAdviceContextTarget
+    public class AdviceInfoContext : IAdviceContextTarget, IInfoAdvice
     {
         /// <summary>
         /// Gets the target.

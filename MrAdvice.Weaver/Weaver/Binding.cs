@@ -24,6 +24,16 @@ namespace ArxOne.MrAdvice.Weaver
         public const string InfoAdviceInterfaceName = "ArxOne.MrAdvice.Advice.IInfoAdvice";
 
         /// <summary>
+        /// The advice context interface name
+        /// Used to identify loose advices (without IAspect reference)
+        /// </summary>
+        public const string AdviceContextInterfaceName = "ArxOne.MrAdvice.Advice.Context.IAdviceContext";
+        /// <summary>
+        /// The information advice context interface name
+        /// </summary>
+        public const string InfoAdviceContextInterfaceName = "ArxOne.MrAdvice.Advice.Context.IInfoAdviceContext";
+
+        /// <summary>
         /// Full name of AdviceExtensions interface
         /// </summary>
         public const string AdviceExtensionsTypeName = "ArxOne.MrAdvice.Advice.AdviceExtensions";

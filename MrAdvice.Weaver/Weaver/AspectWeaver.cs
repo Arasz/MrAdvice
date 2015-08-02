@@ -57,6 +57,9 @@ namespace ArxOne.MrAdvice.Weaver
                 return;
             }
 
+            var adviceContextInterface = TypeResolver.Resolve(moduleDefinition, Binding.AdviceContextInterfaceName, true);
+            // no check here, we're assuming no one broke the application
+
             // runtime check
             auditTimer.NewZone("Runtime check");
             var targetFramework = GetTargetFramework(moduleDefinition);
@@ -66,9 +69,9 @@ namespace ArxOne.MrAdvice.Weaver
 
             // weave methods (they can be property-related, too)
             auditTimer.NewZone("Weavable methods detection");
-            var weavableMethods = GetMarkedMethods(moduleDefinition, adviceInterface).Where(IsWeavable).ToArray();
+            var weavableMethods = GetMarkedMethods(moduleDefinition, adviceInterface, adviceContextInterface).Where(IsWeavable).ToArray();
             auditTimer.NewZone("Methods weaving");
-            weavableMethods.AsParallel().ForAll(m => WeaveMethod(moduleDefinition, m, adviceInterface));
+            weavableMethods.AsParallel().ForAll(m => WeaveMethod(moduleDefinition, m, adviceInterface, adviceContextInterface));
 
             auditTimer.NewZone("Weavable interfaces detection");
             var weavableInterfaces = GetAdviceHandledInterfaces(moduleDefinition).ToArray();
@@ -80,7 +83,8 @@ namespace ArxOne.MrAdvice.Weaver
             // and then, the info advices
             auditTimer.NewZone("Info advices weaving");
             var infoAdviceInterface = TypeResolver.Resolve(moduleDefinition, Binding.InfoAdviceInterfaceName, true);
-            moduleDefinition.GetTypes().AsParallel().ForAll(t => WeaveInfoAdvices(moduleDefinition, t, infoAdviceInterface));
+            var infoAdviceContextInterface = TypeResolver.Resolve(moduleDefinition, Binding.InfoAdviceContextInterfaceName, true);
+            moduleDefinition.GetTypes().AsParallel().ForAll(t => WeaveInfoAdvices(moduleDefinition, t, infoAdviceInterface, infoAdviceContextInterface));
 
             auditTimer.LastZone();
 
@@ -256,11 +260,12 @@ namespace ArxOne.MrAdvice.Weaver
         /// </summary>
         /// <param name="reflectionNode">The reflection node.</param>
         /// <param name="markerInterface">The marker interface.</param>
+        /// <param name="parameterMarkerInterface">The parameter marker interface.</param>
         /// <returns></returns>
-        private IEnumerable<MethodDefinition> GetMarkedMethods(ReflectionNode reflectionNode, TypeDefinition markerInterface)
+        private IEnumerable<MethodDefinition> GetMarkedMethods(ReflectionNode reflectionNode, TypeDefinition markerInterface, TypeDefinition parameterMarkerInterface)
         {
             return reflectionNode.GetAncestorsToChildren().AsParallel()
-                .Where(n => n.Method != null && GetAllMarkers(n, markerInterface).Any())
+                .Where(n => n.Method != null && GetAllMarkers(n, markerInterface, parameterMarkerInterface).Any())
                 .Select(n => n.Method);
         }
 
@@ -269,11 +274,13 @@ namespace ArxOne.MrAdvice.Weaver
         /// </summary>
         /// <param name="reflectionNode">The reflection node.</param>
         /// <param name="markerInterface">The advice interface.</param>
+        /// <param name="parameterMarkerInterface">The parameter marker interface.</param>
         /// <returns></returns>
-        private IEnumerable<TypeReference> GetAllMarkers(ReflectionNode reflectionNode, TypeDefinition markerInterface)
+        private IEnumerable<TypeReference> GetAllMarkers(ReflectionNode reflectionNode, TypeDefinition markerInterface, TypeDefinition parameterMarkerInterface)
         {
             var markers = reflectionNode.GetAncestorsToChildren()
-                .SelectMany(n => n.CustomAttributes.SelectMany(a => a.AttributeType.Resolve().GetSelfAndParents()).Where(t => IsMarker(t, markerInterface)))
+                .SelectMany(n => n.CustomAttributes.SelectMany(a => a.AttributeType.Resolve().GetSelfAndParents())
+                .Where(t => IsMarker(t, markerInterface) || IsImplicitAdvice(t, parameterMarkerInterface)))
                 .Distinct();
 #if DEBUG
             //            Logger.WriteDebug(string.Format("{0} --> {1}", reflectionNode.ToString(), markers.Count()));
@@ -281,7 +288,7 @@ namespace ArxOne.MrAdvice.Weaver
             return markers;
         }
 
-        private readonly IDictionary<Tuple<string, string>, bool> _isInterface = new Dictionary<Tuple<string, string>, bool>();
+        private readonly IDictionary<Tuple<string, string>, bool> _isMarker = new Dictionary<Tuple<string, string>, bool>();
 
         /// <summary>
         /// Determines whether the specified type reference is aspect.
@@ -291,20 +298,54 @@ namespace ArxOne.MrAdvice.Weaver
         /// <returns></returns>
         private bool IsMarker(TypeReference typeReference, TypeDefinition markerInterface)
         {
-            lock (_isInterface)
+            lock (_isMarker)
             {
                 var key = Tuple.Create(typeReference.FullName, markerInterface.FullName);
                 // there is a cache, because the same attribute may be found several time
                 // and we're in a hurry, the developper is waiting for his program to start!
                 bool isMarker;
-                if (_isInterface.TryGetValue(key, out isMarker))
+                if (_isMarker.TryGetValue(key, out isMarker))
                     return isMarker;
 
                 // otherwise look for type or implemented interfaces (recursively)
                 var interfaces = typeReference.Resolve().Interfaces;
-                _isInterface[key] = isMarker = typeReference.SafeEquivalent(markerInterface)
+                _isMarker[key] = isMarker = typeReference.SafeEquivalent(markerInterface)
                                                || interfaces.Any(i => IsMarker(i, markerInterface));
                 return isMarker;
+            }
+        }
+
+        private readonly IDictionary<Tuple<string, string>, bool> _isParameterMarker = new Dictionary<Tuple<string, string>, bool>();
+
+        private bool IsImplicitAdvice(TypeReference typeReference, TypeDefinition parameterMarkerInterface)
+        {
+            var moduleDefinition = typeReference.Module;
+            lock (_isParameterMarker)
+            {
+                var key = Tuple.Create(typeReference.FullName, parameterMarkerInterface.FullName);
+                // there is a cache, because the same attribute may be found several time
+                // and we're in a hurry, the developper is waiting for his program to start!
+                bool isParameterMarker;
+                if (_isParameterMarker.TryGetValue(key, out isParameterMarker))
+                    return isParameterMarker;
+
+                // look for methods, and search for one (at least) with one parameter implementing IAdviceContext
+                var methods = typeReference.Resolve().GetMethods();
+                foreach (var method in methods)
+                {
+                    // method is something like "void method(xxxAdviceContext)"
+                    if (!method.ReturnType.SafeEquivalent(moduleDefinition.SafeImport(typeof(void))))
+                        continue;
+                    if (method.Parameters.Count != 1)
+                        continue;
+                    if (IsMarker(method.Parameters[0].ParameterType, parameterMarkerInterface))
+                    {
+                        _isParameterMarker[key] = true;
+                        return true;
+                    }
+                }
+                _isParameterMarker[key] = false;
+                return false;
             }
         }
     }
