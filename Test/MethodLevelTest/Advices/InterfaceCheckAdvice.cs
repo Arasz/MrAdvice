@@ -9,6 +9,7 @@ namespace MethodLevelTest.Advices
 {
     using System;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     public class InterfaceCheckAdvice : Attribute, IMethodAdvice

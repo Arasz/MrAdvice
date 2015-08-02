@@ -8,6 +8,7 @@ namespace MethodLevelTest.Advices
 {
     using System;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
     using ArxOne.MrAdvice.Introduction;
 
     public class StaticIntroductionAdvice : Attribute, IMethodAdvice

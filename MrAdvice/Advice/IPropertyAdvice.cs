@@ -6,6 +6,8 @@
 #endregion
 namespace ArxOne.MrAdvice.Advice
 {
+    using Context;
+
     /// <summary>
     /// Advices implementing this interface can intercept access to properties,
     /// in a more precise way than IMethodAdvice would.

@@ -6,6 +6,8 @@
 #endregion
 namespace ArxOne.MrAdvice.Advice
 {
+    using Context;
+
     /// <summary>
     /// Advices implementing this interface work on methods.
     /// Can be used at assembly, type, method or property scope

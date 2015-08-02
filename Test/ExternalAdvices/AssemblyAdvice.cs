@@ -9,6 +9,7 @@ namespace ExternalAdvices
 {
     using System;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
 
     public class AssemblyAdvice : Attribute, IMethodAdvice
     {

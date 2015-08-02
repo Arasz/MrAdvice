@@ -10,6 +10,7 @@ namespace MethodLevelTest.Advices
     using System.Collections.Generic;
     using System.Reflection;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
 
     public class RecordProperties : Attribute, IPropertyInfoAdvice
     {

@@ -8,6 +8,7 @@ namespace MethodLevelTest
 {
     using System;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
 
     // https://github.com/ArxOne/MrAdvice/issues/32
     public class Test

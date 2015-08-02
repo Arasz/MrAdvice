@@ -10,6 +10,7 @@ namespace ArxOne.MrAdvice.Introduction
     using System.Collections.Generic;
     using System.Reflection;
     using Advice;
+    using Advice.Context;
 
     /// <summary>
     /// This class allows to introduce fields in advised type

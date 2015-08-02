@@ -9,6 +9,7 @@ namespace MethodLevelTest.Advices
     using System;
     using System.Threading;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
 
     /// <summary>
     /// Allows to invoke a method asynchronously (here, in a background thread)

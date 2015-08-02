@@ -8,6 +8,7 @@ namespace MethodLevelTest.Advices
 {
     using System;
     using ArxOne.MrAdvice.Advice;
+    using ArxOne.MrAdvice.Advice.Context;
 
     public class EmptyMethodAdvice : Attribute, IMethodAdvice
     {
