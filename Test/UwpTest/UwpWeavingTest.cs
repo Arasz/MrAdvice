@@ -19,6 +19,10 @@ namespace UwpTest
             {
                 return a + b;
             }
+
+            [RenamingAdvice]
+            public void F()
+            { }
         }
 
         [TestMethod]
@@ -28,6 +32,14 @@ namespace UwpTest
             var c = new AdvisedClass();
             var r = c.Add(3, 5);
             Assert.AreEqual(3 + 5 + 1, r);
+        }
+
+        [TestMethod]
+        [TestCategory("UWP")]
+        public void WeavingAdviceUwpTest()
+        {
+            var c = new AdvisedClass();
+            c.F();
         }
     }
 }
